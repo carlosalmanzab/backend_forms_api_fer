@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class DocumentController {
     private final DocumentHandlerService documentHandlerService;
 
-    @GetMapping()
+    @PostMapping()
     @Operation(summary = "Generar documento")
     public ResponseEntity<byte[]> generateDocument(
             @RequestBody

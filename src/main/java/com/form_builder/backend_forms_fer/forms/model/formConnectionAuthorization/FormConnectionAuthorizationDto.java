@@ -11,6 +11,7 @@ public record FormConnectionAuthorizationDto (
         String fromPhone,
         String structureCode,
         String structureLocation,
+        String fromAddress,
         String toName,
         String toIdentification,
         String toLocation

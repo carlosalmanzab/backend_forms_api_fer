@@ -35,7 +35,7 @@ public class FormConnectionAuthorizationService
         DocumentBuildRequestTemplate[] templates = Arrays.stream(FormConnectionAuthorizationDocFields.values())
                 .map(field -> new DocumentBuildRequestTemplate(field.getValue(), getFieldValue(entity, field)))
                 .toArray(DocumentBuildRequestTemplate[]::new);
-        byte[] document = null;
+        byte[] document;
         try {
             document = documentBuilderService.generateWordDocument(FormConnectionAuthorizationDocFields.DOC_PATH.getValue(), templates);
 
@@ -102,16 +102,18 @@ public class FormConnectionAuthorizationService
     private String getFieldValue(FormConnectionAuthoriczationJpaEntity entity, FormConnectionAuthorizationDocFields field) {
         return switch (field) {
             case FIELD_DATE -> entity.getDate();
-            case FIELD_FROM_NAME -> entity.getFromName();
+            case FIELD_FROM_NAME, FIELD_FROM_NAME_2 -> entity.getFromName();
+            case FIELD_FROM_PHONE -> entity.getFromPhone();
             case FIELD_FROM_IDENTIFICATION -> entity.getFromIdentification();
+            case FIELD_FROM_IDENTIFICATION_2 -> entity.getFromIdentification() + " de " + entity.getFromLocation();
             case FIELD_FROM_LOCATION -> entity.getFromLocation();
+            case FIELD_FROM_ADDRESS-> entity.getFromAddress();
             case FIELD_STRUCTURE_CODE -> entity.getStructureCode();
             case FIELD_STRUCTURE_LOCATION -> entity.getStructureLocation();
             case FIELD_TO_NAME -> entity.getToName();
             case FIELD_TO_IDENTIFICATION -> entity.getToIdentification();
             case FIELD_TO_LOCATION -> entity.getToLocation();
             case DOC_PATH -> FormConnectionAuthorizationDocFields.DOC_PATH.getValue();
-            default -> throw new RuntimeException("Unhandled field: " + field);
         };
     }
 

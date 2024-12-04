@@ -17,6 +17,7 @@ public class FormConnectionAuthoriczationJpaEntity extends BaseFormJpaEntity {
     private String fromIdentification;
     private String fromLocation;
     private String fromPhone;
+    private String fromAddress;
     private String structureCode;
     private String structureLocation;
     private String toName;
