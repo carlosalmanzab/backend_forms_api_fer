@@ -1,7 +1,7 @@
 package com.form_builder.backend_forms_fer.forms.service.handler;
 
 import com.form_builder.backend_forms_fer.forms.model.shared.ApiRequestDto;
-import com.form_builder.backend_forms_fer.forms.service.IDocumentBuildTemplate;
+import com.form_builder.backend_forms_fer.forms.service.contracts.IDocumentBuildTemplate;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

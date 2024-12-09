@@ -1,11 +1,11 @@
 package com.form_builder.backend_forms_fer.forms.service;
 
-import com.form_builder.backend_forms_fer.forms.constants.FormConnectionAuthorizationDocFields;
-import com.form_builder.backend_forms_fer.forms.model.formConnectionAuthorization.FormConnectionAuthorizationJpaEntity;
-import com.form_builder.backend_forms_fer.forms.model.formConnectionAuthorization.FormConnectionAuthorizationDto;
-import com.form_builder.backend_forms_fer.forms.model.formConnectionAuthorization.FormConnectionAuthorizationMapper;
+import com.form_builder.backend_forms_fer.forms.constants.FormAuthorizationProceduresDocFields;
+import com.form_builder.backend_forms_fer.forms.model.formAuthorizationProcedures.FormAuthorizationProceduresDto;
+import com.form_builder.backend_forms_fer.forms.model.formAuthorizationProcedures.FormAuthorizationProceduresJpaEntity;
+import com.form_builder.backend_forms_fer.forms.model.formAuthorizationProcedures.FormAuthorizationProceduresMapper;
 import com.form_builder.backend_forms_fer.forms.model.shared.*;
-import com.form_builder.backend_forms_fer.forms.repository.FormConnectionAuthorizationRepository;
+import com.form_builder.backend_forms_fer.forms.repository.FormAuthorizationProceduresRepository;
 import com.form_builder.backend_forms_fer.forms.service.contracts.IDocumentBuildTemplate;
 import com.form_builder.backend_forms_fer.forms.service.contracts.IFormService;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,23 +23,40 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FormConnectionAuthorizationService
-        implements IFormService, IDocumentBuildTemplate {
-
-    private final FormConnectionAuthorizationMapper mapper;
-    private final FormConnectionAuthorizationRepository repository;
+public class FormAuthorizationProceduresService implements IFormService, IDocumentBuildTemplate  {
+    private final FormAuthorizationProceduresMapper mapper;
+    private final FormAuthorizationProceduresRepository repository;
     private final DocumentBuildService documentBuilderService;
+
+    private String getFieldValue(FormAuthorizationProceduresJpaEntity entity, FormAuthorizationProceduresDocFields field) {
+        return switch (field) {
+            case FIELD_DATE -> entity.getDate();
+            case FIELD_FROM_EMAIL -> entity.getFromEmail();
+            case FIELD_FROM_NAME, FIELD_FROM_NAME_2 -> entity.getFromName();
+            case FIELD_FROM_PHONE -> entity.getFromPhone();
+            case FIELD_FROM_IDENTIFICATION -> entity.getFromIdentification();
+            case FIELD_FROM_IDENTIFICATION_2 -> entity.getFromIdentification() + " de " + entity.getFromLocation();
+            case FIELD_FROM_LOCATION -> entity.getFromLocation();
+            case FIELD_FROM_ADDRESS-> entity.getFromAddress();
+            case FIELD_PROJECT_NAME -> entity.getProjectName();
+            case FIELD_PROJECT_LOCATION -> entity.getProjectLocation();
+            case FIELD_PROJECT_ADDRESS -> entity.getProjectAddress();
+            case FIELD_TO_NAME -> entity.getToName();
+            case FIELD_TO_IDENTIFICATION -> entity.getToIdentification();
+            case DOC_PATH -> FormAuthorizationProceduresDocFields.DOC_PATH.getValue();
+        };
+    }
 
     @Override
     public ResponseEntity<byte[]> documentBuild(Long id) {
-        FormConnectionAuthorizationJpaEntity entity = repository.findById(id).orElseThrow(() -> new RuntimeException("Form not found with ID: " + id));
+        FormAuthorizationProceduresJpaEntity entity = repository.findById(id).orElseThrow(() -> new RuntimeException("Form not found with ID: " + id));
 
-        DocumentBuildRequestTemplate[] templates = Arrays.stream(FormConnectionAuthorizationDocFields.values())
+        DocumentBuildRequestTemplate[] templates = Arrays.stream(FormAuthorizationProceduresDocFields.values())
                 .map(field -> new DocumentBuildRequestTemplate(field.getValue(), getFieldValue(entity, field)))
                 .toArray(DocumentBuildRequestTemplate[]::new);
         byte[] document;
         try {
-            document = documentBuilderService.generateWordDocument(FormConnectionAuthorizationDocFields.DOC_PATH.getValue(), templates);
+            document = documentBuilderService.generateWordDocument(FormAuthorizationProceduresDocFields.DOC_PATH.getValue(), templates);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -49,12 +66,13 @@ public class FormConnectionAuthorizationService
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body(null);
         }
+
     }
 
     @Override
     public ResponseEntity<ApiResponseDto> save(ApiRequestDto requestDto) {
         return Optional.of(requestDto.formData())
-                .map(formData -> (FormConnectionAuthorizationDto) formData)
+                .map(formData -> (FormAuthorizationProceduresDto) formData)
                 .map(mapper::toEntity)
                 .map(entity -> {
                     entity.setCreatedDate(new Date());
@@ -70,13 +88,13 @@ public class FormConnectionAuthorizationService
 
     @Override
     public ResponseEntity<ApiResponseDto> update(ApiRequestDto requestDto) {
-        Optional<FormConnectionAuthorizationJpaEntity> existingFormOptional = repository.findById(requestDto.id());
+        Optional<FormAuthorizationProceduresJpaEntity> existingFormOptional = repository.findById(requestDto.id());
         if (existingFormOptional.isPresent()) {
-            FormConnectionAuthorizationJpaEntity existingForm;
-            existingForm = mapper.toEntity((FormConnectionAuthorizationDto) requestDto.formData());
+            FormAuthorizationProceduresJpaEntity existingForm;
+            existingForm = mapper.toEntity((FormAuthorizationProceduresDto) requestDto.formData());
             existingForm.setId(requestDto.id());
             existingForm.setUpdatedDate(new Date());
-            FormConnectionAuthorizationJpaEntity savedEntity = repository.save(existingForm);
+            FormAuthorizationProceduresJpaEntity savedEntity = repository.save(existingForm);
             ApiResponseDto response = mapper.toApiResponseDto(savedEntity);
             return ResponseEntity.ok(response);
         } else {
@@ -86,9 +104,9 @@ public class FormConnectionAuthorizationService
 
     @Override
     public ResponseEntity<ApiResponseDto> findById(ApiRequestDto requestDto) {
-        Optional<FormConnectionAuthorizationJpaEntity> existingFormOptional = repository.findById(requestDto.id());
+        Optional<FormAuthorizationProceduresJpaEntity> existingFormOptional = repository.findById(requestDto.id());
         if (existingFormOptional.isPresent()) {
-            FormConnectionAuthorizationJpaEntity existingForm = existingFormOptional.get();
+            FormAuthorizationProceduresJpaEntity existingForm = existingFormOptional.get();
             ApiResponseDto response = mapper.toApiResponseDto(existingForm);
             return ResponseEntity.ok(response);
         } else {
@@ -98,25 +116,6 @@ public class FormConnectionAuthorizationService
 
     @Override
     public boolean supports(Class<? extends IApiFormDataRequestDto> formClass) {
-        return FormConnectionAuthorizationDto.class.equals(formClass);
+        return FormAuthorizationProceduresDto.class.equals(formClass);
     }
-
-    private String getFieldValue(FormConnectionAuthorizationJpaEntity entity, FormConnectionAuthorizationDocFields field) {
-        return switch (field) {
-            case FIELD_DATE -> entity.getDate();
-            case FIELD_FROM_NAME, FIELD_FROM_NAME_2 -> entity.getFromName();
-            case FIELD_FROM_PHONE -> entity.getFromPhone();
-            case FIELD_FROM_IDENTIFICATION -> entity.getFromIdentification();
-            case FIELD_FROM_IDENTIFICATION_2 -> entity.getFromIdentification() + " de " + entity.getFromLocation();
-            case FIELD_FROM_LOCATION -> entity.getFromLocation();
-            case FIELD_FROM_ADDRESS-> entity.getFromAddress();
-            case FIELD_STRUCTURE_CODE -> entity.getStructureCode();
-            case FIELD_STRUCTURE_LOCATION -> entity.getStructureLocation();
-            case FIELD_TO_NAME -> entity.getToName();
-            case FIELD_TO_IDENTIFICATION -> entity.getToIdentification();
-            case FIELD_TO_LOCATION -> entity.getToLocation();
-            case DOC_PATH -> FormConnectionAuthorizationDocFields.DOC_PATH.getValue();
-        };
-    }
-
 }

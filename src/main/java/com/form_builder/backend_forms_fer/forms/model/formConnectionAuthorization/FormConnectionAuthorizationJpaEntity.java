@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 @Table(name = "form_connection_authorization")
-public class FormConnectionAuthoriczationJpaEntity extends BaseFormJpaEntity {
+public class FormConnectionAuthorizationJpaEntity extends BaseFormJpaEntity {
     private String date;
     private String fromName;
     private String fromIdentification;

@@ -2,16 +2,13 @@ package com.form_builder.backend_forms_fer.forms.service.handler;
 
 import com.form_builder.backend_forms_fer.forms.model.shared.ApiRequestDto;
 import com.form_builder.backend_forms_fer.forms.model.shared.ApiResponseDto;
-import com.form_builder.backend_forms_fer.forms.model.shared.IApiFormDataRequestDto;
-import com.form_builder.backend_forms_fer.forms.model.shared.IApiFormDataResponseDto;
-import com.form_builder.backend_forms_fer.forms.service.IFormCRUDService;
-import com.form_builder.backend_forms_fer.forms.service.IFormService;
+import com.form_builder.backend_forms_fer.forms.service.contracts.IFormCRUDService;
+import com.form_builder.backend_forms_fer.forms.service.contracts.IFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

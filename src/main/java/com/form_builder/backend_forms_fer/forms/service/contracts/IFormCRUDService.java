@@ -1,4 +1,4 @@
-package com.form_builder.backend_forms_fer.forms.service;
+package com.form_builder.backend_forms_fer.forms.service.contracts;
 
 import com.form_builder.backend_forms_fer.forms.model.shared.*;
 import org.springframework.http.ResponseEntity;
